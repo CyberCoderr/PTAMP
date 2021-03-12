@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
@@ -13,8 +13,9 @@ namespace GameServer
 
         public Vector3 position;
         public Quaternion rotation;
+        
 
-        private float moveSpeed = 5f / Constants.TICKS_PER_SEC;
+        private float moveSpeed = 20f / Constants.TICKS_PER_SEC;
         private bool[] inputs;
 
         public Player(int _id, string _username, Vector3 _spawnPosition)
@@ -52,11 +53,15 @@ namespace GameServer
 
         private void Move(Vector2 _inputDirection)
         {
-            Vector3 _forward = Vector3.Transform(new Vector3(0, 0, 1), rotation);
-            Vector3 _right = Vector3.Normalize(Vector3.Cross(_forward, new Vector3(0, 1, 0)));
+            Vector3 _forward = Vector3.Transform(new Vector3(0, 1, 0), rotation);
+            Vector3 _right = Vector3.Transform(new Vector3(-1, 0, 0), rotation);
+
+            
 
             Vector3 _moveDirection = _right * _inputDirection.X + _forward * _inputDirection.Y;
-            position += _moveDirection * moveSpeed;
+
+            Vector3 _move = Vector3.Lerp(position, position += _moveDirection * moveSpeed, moveSpeed);
+            position = _move;
 
             ServerSend.PlayerPosition(this);
             ServerSend.PlayerRotation(this);
